@@ -1,3 +1,6 @@
 node_modules
 ormconfig.*
 !ormconfig.example.json
+.env
+.env.*
+!.env.example
