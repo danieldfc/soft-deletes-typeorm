@@ -12,9 +12,19 @@ export default class UsersRepository implements IUsersRepository {
     this.ormRepository = getRepository(User);
   }
 
+  public async find(): Promise<User[]> {
+    return this.ormRepository.find({
+      withDeleted: false,
+      order: {
+        created_at: 'DESC',
+      },
+    });
+  }
+
   public async findById(id: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOneOrFail(id, {
-      withDeleted: true,
+    const user = await this.ormRepository.findOne({
+      where: { id },
+      withDeleted: false,
     });
     return user;
   }
@@ -22,8 +32,9 @@ export default class UsersRepository implements IUsersRepository {
   public async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
       where: { email },
-      withDeleted: true,
+      withDeleted: false,
     });
+
     return user;
   }
 
@@ -37,5 +48,9 @@ export default class UsersRepository implements IUsersRepository {
 
   public async save(user: User): Promise<User> {
     return this.ormRepository.save(user);
+  }
+
+  public async delete(user: User): Promise<void> {
+    await this.ormRepository.manager.softRemove(user);
   }
 }

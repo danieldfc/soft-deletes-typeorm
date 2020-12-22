@@ -5,11 +5,9 @@ import UsersController from '../controllers/UsersController';
 const usersRouter = Router();
 const usersController = new UsersController();
 
-usersRouter.get('/', (request, response) => {
-  return response.json({ ok: true });
-});
-
+usersRouter.get('/', usersController.index);
 usersRouter.get('/:id', usersController.show);
 usersRouter.post('/', usersController.create);
+usersRouter.delete('/:id', usersController.delete);
 
 export default usersRouter;

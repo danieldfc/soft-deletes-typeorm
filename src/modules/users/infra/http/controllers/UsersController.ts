@@ -1,9 +1,21 @@
-import CreateUserService from '@modules/users/services/CreateUserService';
-import ShowUserService from '@modules/users/services/ShowUserService';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { classToClass } from 'class-transformer';
+
+import ListAllUsersService from '@modules/users/services/ListAllUsersService';
+import ShowUserService from '@modules/users/services/ShowUserService';
+import CreateUserService from '@modules/users/services/CreateUserService';
+import DeleteUserService from '@modules/users/services/DeleteUserService';
 
 export default class UsersController {
+  async index(request: Request, response: Response): Promise<Response> {
+    const listAllUsers = container.resolve(ListAllUsersService);
+
+    const users = await listAllUsers.execute();
+
+    return response.json(classToClass(users));
+  }
+
   async show(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
@@ -13,7 +25,7 @@ export default class UsersController {
       userId: id,
     });
 
-    return response.json(user);
+    return response.json(classToClass(user));
   }
 
   async create(request: Request, response: Response): Promise<Response> {
@@ -27,6 +39,16 @@ export default class UsersController {
       password,
     });
 
-    return response.json(user);
+    return response.json(classToClass(user));
+  }
+
+  async delete(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+
+    const deleteUser = container.resolve(DeleteUserService);
+
+    await deleteUser.execute(id);
+
+    return response.status(204).send();
   }
 }
